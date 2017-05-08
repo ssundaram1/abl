@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 public class LockingExample
 {
-    private static final int        QTY = 10;
+    private static final int        QTY = 5;
     private static final int        REPETITIONS = QTY * 10;
 
     private static final String     PATH = "/extract";
@@ -59,7 +59,7 @@ public class LockingExample
         }
 
         mainClient.create().withMode(CreateMode.PERSISTENT).forPath(PATH,null);
-        for(int i =0; i<10;i++){
+        for(int i =0; i<20;i++){
             mainClient.create().withMode(CreateMode.PERSISTENT).forPath(PATH+"/org"+i,null);
         }
 
