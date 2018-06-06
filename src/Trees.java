@@ -89,6 +89,23 @@ public class Trees {
 
     }
 
+
+//
+//              6
+//           /      \
+//           3          5
+//       /   \          \
+//       2     5          4
+//           /   \
+//           7     4
+//    There are 4 leaves, hence 4 root to leaf paths:
+//    Path                    Number
+//  6->3->2                   632
+//          6->3->5->7               6357
+//          6->3->5->4               6354
+//          6->5>4                    654
+//    Answer = 632 + 6357 + 6354 + 654 = 13997
+
     public static int sumNumbers(Node root) {
         return sum(root, 0);
     }
@@ -228,6 +245,21 @@ public class Trees {
 
     }
 
+
+    private static Node invert1(Node node){
+        if(node == null){
+            return null;
+        }
+        Node invertedLeft = invert(node.left);
+        Node invertedRight = invert(node.right);
+        node.left = invertedRight;
+        node.right = invertedLeft;
+
+        System.out.println("After Inverting tree");
+        return node;
+
+    }
+
     private static void printLevelOrder1(Node node){
         if(node != null){
             Queue<Node> q = new LinkedList<>();
@@ -334,6 +366,11 @@ public class Trees {
                 this.right = right;
             }
 
+            @Override
+            public String toString(){
+                return ""+data;
+            }
+
         }
 
 
@@ -435,6 +472,27 @@ public class Trees {
 
         root.setLeft(l1);
         root.setRight(r1);
+        return root;
+    }
+
+    //            1
+    //            / \
+    //            2   3
+    //            / \
+    //            4   5
+    //    Print: [4 5 3], [2], [1]
+    private static Node buildTreeImbal() {
+        final Node root = new Node(1);
+        final Node l1 = new Node(2);
+        final Node r1 = new Node(3);
+        final Node ll2 = new Node(4);
+        final Node lr2 = new Node(5);
+
+
+        root.setLeft(l1);
+        root.setRight(r1);
+        l1.setLeft(ll2);
+        l1.setRight(lr2);
         return root;
     }
 
@@ -555,6 +613,25 @@ public class Trees {
         return node;
     }
 
+
+
+    private static boolean isBST1(Node node, int MIN, int MAX) {
+        if (node == null)
+            return true;
+        boolean isLeft = isBST1(node.left, MIN, node.data);
+        boolean isRight = isBST1(node.right,node.data, MAX );
+        boolean isBST = node.data > MIN && node.data < MAX && isLeft && isRight;
+        return isBST;
+
+    }
+
+    private static boolean isBST(Node node, int MIN, int MAX) {
+        if (node == null)
+            return true;
+        return(node.data > MIN && node.data < MAX && isBST(node.left, MIN, node.data) && isBST(node.right, node.data, MAX));
+
+    }
+
     private static class Info{
         private int size;
         private  int min;
@@ -600,24 +677,6 @@ public class Trees {
         }
     }
 
-    private static boolean isBST1(Node node, int MIN, int MAX) {
-        if (node == null)
-            return true;
-        boolean isLeft = isBST1(node.left, MIN, node.data);
-        boolean isRight = isBST1(node.right,node.data, MAX );
-        boolean isBST = node.data > MIN && node.data < MAX && isLeft && isRight;
-        return isBST;
-
-    }
-
-    private static boolean isBST(Node node, int MIN, int MAX) {
-        if (node == null)
-            return true;
-        return(node.data > MIN && node.data < MAX && isBST(node.left, MIN, node.data) && isBST(node.right, node.data, MAX));
-
-    }
-
-
     private static int largestBST(Node node){
         return largestBSTHelper(node).size;
     }
@@ -641,13 +700,13 @@ public class Trees {
 
     }
 
+
     public boolean isSymmetric(Node root) {
         if(root==null) return true;
         return isMirror(root.left,root.right);
     }
     public boolean isMirror(Node p, Node q) {
-        if(p==null && q==null) return true;
-        if(p==null || q==null) return false;
+        if(p==null || q==null) return p == q;
         return (p.data==q.data) && isMirror(p.left,q.right) && isMirror(p.right,q.left);
     }
 
@@ -870,11 +929,12 @@ public class Trees {
             sums.clear();
             sums.add(key);
         }
-        sum[0] +=  Math.abs(leftSum - rightSum);
+        sum[0] =  Math.max(sum[0], key);
         return leftSum + rightSum + node.data;
 
 
     }
+
 
 
    private static boolean isBalanaced(Node node){
@@ -888,6 +948,179 @@ public class Trees {
        return Math.max(depth(node.left), depth(node.right))+1;
     }
 
+    private static class Relation{
+        Integer parent;
+        Integer child;
+        boolean isLeft;
+        Relation(Integer child, Integer parent, boolean isLeft){
+            this.parent = parent;
+            this.child = child;
+            this.isLeft = isLeft;
+        }
+    }
+
+    //    Given the following relationships:
+//
+//       Child Parent IsLeft
+//        15 20 true
+//        19 80 true
+//        17 20 false
+//        16 80 false
+//        80 50 false
+//        50 null false
+//        20 50 true
+//
+//    You should return the following tree:
+//
+//            50
+//            /  \
+//            20   80
+//            / \   / \
+//            15 17 19 16
+//    Function Signature
+//
+
+    private static Node buildTreeFromRelationList(List<Relation> relations){
+       Map<Integer, List<Relation>> parentToRelationMap = new HashMap<>();
+       Node root = null;
+       for(Relation relation: relations){
+           if(relation.parent == null ){
+                root = new Node(relation.child);
+           }else{
+               List<Relation> relationList =  parentToRelationMap.getOrDefault(relation.parent, new ArrayList<>());
+               relationList.add(relation);
+               parentToRelationMap.put(relation.parent, relationList);
+           }
+       }
+       root = buildTreeFromMap(root, parentToRelationMap);
+       return root;
+    }
+
+    private static Node buildTreeFromMap(Node root, Map<Integer, List<Relation>> parentToRelationMap) {
+
+        List<Relation> relations = parentToRelationMap.getOrDefault(root.data, new ArrayList<>());
+        //leaf node
+        if(relations.isEmpty()){
+            return root;
+        }
+        for(Relation relation:relations){
+            if(relation.isLeft) {
+                root.left = buildTreeFromMap(new Node(relation.child), parentToRelationMap);
+            }else{
+                root.right = buildTreeFromMap(new Node(relation.child), parentToRelationMap);
+            }
+        }
+        return root;
+    }
+
+    //TODO: Print and remove leaf nodes until root node left
+//    Given a imbalance binary tree, print the leaf nodes then remove those leaf node, print the new leaf nodes until only root node left.
+//
+//    For example:
+//
+//            1
+//            / \
+//            2   3
+//            / \
+//            4   5
+//    Print: [4 5 3], [2], [1]
+
+    static int dropByLevel(Node root,Map<Integer,ArrayList<Node>> map) {
+        if (root != null) {
+            int l = dropByLevel(root.left, map);
+            int r = dropByLevel(root.right, map);
+            int h = Math.max(l, r) + 1;
+            ArrayList<Node> arr = map.containsKey(h) ? map.get(h)  : new ArrayList<>();
+            arr.add(root);
+            map.put(h, arr);
+            return h;
+        }
+        return 0;
+    }
+    //    private static Node printandRemoveLeaves(Node root, List<List<Node>> nodes){
+//        printandRemoveLeaves(root.left, nodes);
+//        printandRemoveLeaves(root.right, nodes);
+//        if(root.left != null && root.left.left == null && root.left.right == null){
+//
+//        }
+//        return printLevelOrder1(root);
+//
+//    }
+
+
+
+//      20
+//              /     \
+//              10      30
+//              /  \    /  \
+//              5     15 25   35
+
+
+
+
+    /**
+     * Given two nodes of a tree,
+     * method should return the deepest common ancestor of those nodes.
+     *
+     *          A
+     *         / \
+     *        B   C
+     *       / \
+     *      D   E
+     *         / \
+     *        G   F
+     *
+     *  commonAncestor(D, F) = B
+     *  commonAncestor(C, G) = A
+     *  commonAncestor(E, B) = B
+     */
+
+//        class Node {
+//            final Node parent;
+//            final Node left;
+//            final Node right;
+//
+//            public Node(Node parent, Node left, Node right) {
+//                this.parent = parent;
+//                this.left = left;
+//                this.right = right;
+//            }
+//            boolean isRoot() {
+//                return parent == null;
+//            }
+
+            //     IMPLEMENT THIS FUNCTION
+//            Node commonAncestor(Node one, Node two);
+
+//        while t1.parent != None and t2.parent != None:
+//                if t1.parent == t2:
+//                return t2
+//        elif t2.parent == t1:
+//                return t1
+//        elif t1.parent == t2.parent:
+//                return t1.parent
+//                t1  = t1.parent
+//        t2  = t2.parent
+//    if t1.parent == None:
+//                return t1
+//    else:
+//            return t2
+
+
+    //
+//
+//    public static void flatten(Node root) {
+//        if (root == null)
+//            return;
+//        flatten(root.right);
+//        flatten(root.left);
+//        root.right = prev;
+//        root.left = null;
+//        prev = root;
+//    }
+
+
+
 
     public static void main(String[] args) {
         Node root = buildTree();
@@ -898,7 +1131,7 @@ public class Trees {
         System.out.println(sb.toString());
         //printLevelOrder(root);
         printLevelOrder1(root);
-        invert(root);
+        invert1(root);
         printLevelOrder1(root);
         root = buildTree();
         printLevelOrder1(root);
@@ -946,7 +1179,126 @@ public class Trees {
         root = buildBST2();
         printLevelOrder1(root);
         System.out.println(" largest BST : "+largestBST(root));
+        //       Child Parent IsLeft
+        //        15 20 true
+        //        19 80 true
+        //        17 20 false
+        //        16 80 false
+        //        80 50 false
+        //        50 null false
+        //        20 50 true
+        root = buildTreeFromRelationList(Arrays.asList(
+               new Relation(15, 20, true),
+                new Relation(19, 80, true),
+                new Relation(17, 20, false),
+                new Relation(16, 80, false),
+                new Relation(80, 50, false),
+                new Relation(50, null, false),
+                new Relation(20, 50, true)
+                ));
+            System.out.println(" Tree from relations ");
+            printLevelOrder1(root);
 
+            //            1
+            //            / \
+            //            2   3
+            //            / \
+            //            4   5
+            //    Print: [4 5 3], [2], [1]
+
+            Map<Integer,ArrayList<Node>> map  =  new HashMap<>();
+            root = buildTreeImbal();
+            dropByLevel(root,  map) ;
+            for (Map.Entry<Integer, ArrayList<Node>> entry  :  map.entrySet())  {
+                System.out.println("leaves");
+                System.out.println(entry.getValue());
+            }
+
+
+
+}
+
+    void printkdistanceNodeDown(Node node, int k)
+    {
+        // Base Case
+        if (node == null || k < 0)
+            return;
+
+        // If we reach a k distant node, print it
+        if (k == 0)
+        {
+            System.out.print(node.data);
+            System.out.println("");
+            return;
+        }
+
+        // Recur for left and right subtrees
+        printkdistanceNodeDown(node.left, k - 1);
+        printkdistanceNodeDown(node.right, k - 1);
+    }
+
+    // Prints all nodes at distance k from a given target node.
+    // The k distant nodes may be upward or downward.This function
+    // Returns distance of root from target node, it returns -1
+    // if target node is not present in tree rooted with root.
+    int printkdistanceNode(Node node, Node target, int k)
+    {
+        // Base Case 1: If tree is empty, return -1
+        if (node == null)
+            return -1;
+
+        // If target is same as root.  Use the downward function
+        // to print all nodes at distance k in subtree rooted with
+        // target or root
+        if (node == target)
+        {
+            printkdistanceNodeDown(node, k);
+            return 0;
+        }
+
+        // Recur for left subtree
+        int dl = printkdistanceNode(node.left, target, k);
+
+        // Check if target node was found in left subtree
+        if (dl != -1)
+        {
+
+            // If root is at distance k from target, print root
+            // Note that dl is Distance of root's left child from
+            // target
+            if (dl + 1 == k)
+            {
+                System.out.print(node.data);
+                System.out.println("");
+            }
+
+            // Else go to right subtree and print all k-dl-2 distant nodes
+            // Note that the right child is 2 edges away from left child
+            else
+                printkdistanceNodeDown(node.right, k - dl - 2);
+
+            // Add 1 to the distance and return value for parent calls
+            return 1 + dl;
+        }
+
+        // MIRROR OF ABOVE CODE FOR RIGHT SUBTREE
+        // Note that we reach here only when node was not found in left
+        // subtree
+        int dr = printkdistanceNode(node.right, target, k);
+        if (dr != -1)
+        {
+            if (dr + 1 == k)
+            {
+                System.out.print(node.data);
+                System.out.println("");
+            }
+            else
+                printkdistanceNodeDown(node.left, k - dr - 2);
+            return 1 + dr;
+        }
+
+        // If target was neither present in left nor in right subtree
+        return -1;
     }
 
     private static boolean isBST1(Node root) {
