@@ -126,8 +126,143 @@ public class Goog {
         return res;
     }
 
+//    SlidingWindow window = new SlidingWindow(3);
+//window.add(1); // [1]
+//window.add(2); // [1, 2]
+//window.getProduct(); // 2
+//window.add(3); // [1, 2, 3]
+//window.getProduct(); // 6
+//window.add(4); // [2, 3, 4]
+//window.getProduct(); // 24
+
+//window.add(1); // [1]
+//window.add(2); // [1, 2]
+//window.getProduct(); // 2
+//window.add(3); // [1, 2, 3]
+//window.getProduct(); // 6
+//window.add(4); // [2, 3, 4]
+//window.getProduct(); // 24
+
+
+    static class SlidingWindow{
+        int size =0;
+        int idx =0;
+        int[] vals;
+        int product =1;
+        int count =0;
+        int zeroCount =0;
+        public SlidingWindow(int size){
+            this.size =size;
+            vals = new int[size];
+        }
+        void add(int val){
+            int temp = vals[idx];
+            vals[idx]= val;
+            idx = (idx+1)%size;
+            count++;
+            if(val ==0){
+                zeroCount++;
+            }else{
+                product = product *val;
+            }
+            if(count > size){
+                if(temp ==0){
+                    zeroCount--;
+                }else{
+                    product = product/temp;
+                }
+            }
+        }
+        int getProduct(){
+            return zeroCount >0? 0: product;
+        }
+    }
+
+
+    //2, 1, 3, 4, 6  d =2
+    // 3 - [2,1,3]
+
+    //30,15,1,4,1,2,3,4,1
+
+    public static int subArraySum(int[] nums, int k){
+        PriorityQueue<Integer> minPq = new PriorityQueue<>();
+        PriorityQueue<Integer> maxPq = new PriorityQueue<>(Collections.reverseOrder());
+
+        int start=0, end =0;
+        int sum =0, length = Integer.MIN_VALUE;
+        while(end < nums.length){
+            int current = nums[end++];
+            minPq.add(current);
+            maxPq.add(current);
+            int max = maxPq.peek();
+            int min = minPq.peek();
+            while(start< nums.length && max - min > k){
+                minPq.remove(nums[start]);
+                maxPq.remove(nums[start]);
+                max = maxPq.peek();
+                min = minPq.peek();
+                start++;
+            }
+            length = Math.max(length, end - start);
+        }
+        return length > Integer.MIN_VALUE ? length : -1;
+    }
+
+
+    //[2, 4, 5, 3, 6, 4, 7, 3]
+    // 0-3, 3-7 largest
+
+
+    //3, 4, 5, 3, 6, 4, 7, 2
+
+    // 1,2,3,4,5,6,7
+
+    //7,6,5,4,2
+
+    //1 3 4 5 6 7 2
+    //2 4 5 6 2 4 6 1
+
+
+    public static int largestMountain(int[] nums){
+        int left = 0, right = nums.length -1;
+        int max = Math.max(nums[left], nums[right]);
+        int largest =0;
+        int iMax =0;
+        int leftMAx =0;
+        for(int i=1; i< nums.length; i++){
+            if(nums[i] <= max){
+               if(largest < i -left +1){
+                   iMax =i;
+                   leftMAx = left;
+               }
+                largest = Math.max(largest, i - left +1);
+                left = i;
+                max= Math.max(nums[left], nums[right]);
+            }
+        }
+        System.out.println(" largest subarray "+Arrays.toString(Arrays.copyOfRange(nums, leftMAx, iMax+1)));
+        return largest;
+    }
 
     public static void main(String[] args){
+
+        SlidingWindow window = new SlidingWindow(3);
+        window.add(1); // [1]
+        window.add(2); // [1, 2]
+        System.out.println(" getProd: "+window.getProduct()); // 2
+        window.add(3); // [1, 2, 3]
+        System.out.println(" getProd: "+window.getProduct()); // 6
+        window.add(4); // [2, 3, 4]
+        System.out.println(" getProd: "+window.getProduct()); // 24
+        window.add(0); // [3, 4, 0]
+        System.out.println(" getProd: "+window.getProduct()); // 0
+        window.add(1); // [4,0,1]
+        window.add(2); // [0,1, 2]
+        System.out.println(" getProd: "+window.getProduct()); // 0
+        window.add(3); // [1, 2, 3]
+        System.out.println(" getProd: "+window.getProduct()); // 6
+
+
 
         System.out.println(" sorted recon queue: "+ Arrays.deepToString(reconstructQueue(new int[][]{{7,0}, {4,4}, {7,1}, {5,0}, {6,1}, {5,2}})));
         System.out.println(" spiral matrix : "+ spiralOrder(
@@ -141,6 +276,29 @@ public class Goog {
 
         //[1,2,3,1], k = 4, t = 0
         System.out.println(" containsNearbyAlmostDuplicate :"+ containsNearbyAlmostDuplicate(new int[]{1,2,3,1}, 4, 0));
+
+        System.out.println(subArraySum(new int[]{2, 1, 3, 4, 6}, 2));
+
+        System.out.println(subArraySum(new int[]{30,15,1,4,1,2,3,4,1}, 15));
+
+
+        System.out.println(subArraySum(new int[]{30,15,1,4,1,2,3,4,1}, 2));
+
+  //      System.out.println("Largest mtn :"+ largestMountain(new int[]{ 2, 4, 5, 3, 6, 4, 7, 3}));
+//
+//        System.out.println("Largest mtn :"+ largestMountain(new int[]{ 1,1,1,2,5,6,7,3}));
+//
+//        System.out.println("Largest mtn :"+ largestMountain(new int[]{ 2,3,3,1,2,2,4,0}));
+
+        System.out.println("Largest mtn :"+ largestMountain(new int[]{ 1,2,3,4}));
+
+        System.out.println("Largest mtn :"+ largestMountain(new int[]{ 4,2,3,1}));
+
+        System.out.println("Largest mtn :"+ largestMountain(new int[]{ 4,3,2,1}));
+
+
+
+
 
     }
 

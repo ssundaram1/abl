@@ -1,3 +1,4 @@
+import javax.swing.tree.TreeNode;
 import java.util.*;
 
 /**
@@ -1213,10 +1214,48 @@ public class Trees {
                 System.out.println("leaves");
                 System.out.println(entry.getValue());
             }
+        root = buildTreeNew();
+        System.out.println("Max sum from alt levels "+ getMaxSumForAlternateLevel(root));
+    }
 
+    private static int getMaxSumForAlternateLevel(Node root) {
+        if(root == null){
+            return 0;
+        }
+        int[] levelSum =new int[2];
+        Queue<Node> q = new LinkedList<>();
+        q.add(root);
+        int level =0;
+        while(!q.isEmpty()){
+            int size = q.size();
+            for(int i=0; i< size; i++){
+                Node node = q.remove();
+                if(node.left != null){
+                    q.add(node.left);
+                }
+                if(node.right != null){
+                    q.add(node.right);
+                }
+                if(level % 2 ==0){
+                    levelSum[0]+= node.data;
+                }else{
+                    levelSum[1]+= node.data;
+                }
+            }
+            level++;
+        }
+        return Math.max(levelSum[0], levelSum[1]);
+    }
 
-
-}
+    private static Node buildTreeNew() {
+        Node root = new Node(1);
+        root.left = new Node(2);
+        root.right = new Node(3);
+        root.right.left = new Node(4);
+        root.right.left.right = new Node(5);
+        root.right.left.right.left = new Node(6);
+        return root;
+    }
 
     void printkdistanceNodeDown(Node node, int k)
     {

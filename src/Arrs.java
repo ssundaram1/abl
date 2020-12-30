@@ -1099,8 +1099,6 @@ static int missingNumber(int[] nums) {
 
 
 
-
-
     public static void main(String[] args){
 
         List<String> justifiedText = textJustified(new String[]{"This", "is", "an", "example", "of", "text", "justification."}, 16);

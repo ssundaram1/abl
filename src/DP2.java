@@ -68,7 +68,7 @@ public class DP2 {
 
 
 
-    // Driver program to test above functions
+    // Nate program to test above functions
     public static void main(String[] args)
     {
         isInterleaved("XXY", "XXZ", "XXZXXXY");

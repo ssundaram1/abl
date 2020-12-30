@@ -50,7 +50,7 @@ public class MatrixOrderOptimization {
             return min;
         }
 
-        // Driver program to test above function
+        // Nate program to test above function
         public static void main(String args[])
         {
             int arr[] = new int[] {1, 2, 3, 4, 3};

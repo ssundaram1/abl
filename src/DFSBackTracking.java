@@ -199,6 +199,112 @@ public class DFSBackTracking {
         return true;
     }
 
+
+//    private void permute(String str, int l, int r)
+//    {
+//        if (l == r)
+//            System.out.println(str);
+//        else
+//        {
+//            for (int i = l; i <= r; i++)
+//            {
+//                str = swap(str,l,i);
+//                permute(str, l+1, r);
+//                str = swap(str,l,i);
+//            }
+//        }
+//    }
+
+    private static void perm1(char[] a, int l) {
+        if (l == a.length -1) {
+            System.out.println(new String(a));
+            return;
+        }
+        for (int i = l; i < a.length-1; i++) {
+            swap(a, l, i);
+            perm1(a, l+1);
+            swap(a, l, i);
+        }
+    }
+
+    private static void permute123(char[] str, int l, int r)
+    {
+        if (l == r)
+            System.out.println(str);
+        else
+        {
+            for (int i = l; i <= r; i++)
+            {
+                swap(str,l,i);
+                permute123(str, l+1, r);
+                swap(str,l,i);
+            }
+        }
+    }
+
+    // print n! permutation of the elements of array a (not in order)
+    public static void perm2(String s) {
+        int n = s.length();
+        char[] a = new char[n];
+        for (int i = 0; i < n; i++)
+            a[i] = s.charAt(i);
+        //perm2(a, n);
+        perm1(s.toCharArray(),0);
+    }
+
+    private static void perm2(char[] a, int n) {
+        if (n == 1) {
+            System.out.println(new String(a));
+            return;
+        }
+        for (int i = 0; i < n; i++) {
+            swap(a, i, n-1);
+            perm2(a, n-1);
+            swap(a, i, n-1);
+        }
+    }
+
+
+
+
+
+    // swap the characters at indices i and j
+    private static void swap(char[] a, int i, int j) {
+        char c = a[i];
+        a[i] = a[j];
+        a[j] = c;
+    }
+
+
+    public void helper(int[] nums, List<Integer> temp, List<List<Integer>> result){
+        if(nums.length == temp.size()){
+            result.add(new ArrayList<>(temp));
+        }
+        for(int i=0; i< nums.length;i++){
+            if(temp.contains(nums[i])){
+                continue;
+            }
+            temp.add(nums[i]);
+            helper(nums, temp, result);
+            temp.remove(temp.size() - 1);
+        }
+    }
+
+    public static void permutation(String str) {
+        permutation("", str);
+    }
+
+    private static void permutation(String prefix, String str) {
+        int n = str.length();
+        if (n == 0) System.out.println(prefix);
+        else {
+            for (int i = 0; i < n; i++)
+                permutation(prefix + str.charAt(i), str.substring(0, i) + str.substring(i+1, n));
+        }
+    }
+
+
+
     public static void main(String[] args) {
         System.out.println("Subset: "+ subsets(new int[]{1,2,3}));
 
@@ -214,6 +320,12 @@ public class DFSBackTracking {
 
         System.out.println("pali partition sum: "+ partition("aab"));
 
+        System.out.println("printing string perms");perm2("abc");
+
+        System.out.println("printing string perms");permute123("abc".toCharArray(), 0 , 2);
+
+
+        //System.out.println(" distinct str perm "); permutation("", "aab");
 
 
 

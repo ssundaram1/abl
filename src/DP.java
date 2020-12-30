@@ -303,7 +303,7 @@ public class DP {
 
 
 
-    // Driver program to test above function.
+    // Nate program to test above function.
     public static void main(String args[])
     {
         String str = "geeks";
